@@ -1,9 +1,9 @@
 {
-  "name": "kelvin",
+  "name": "turbojet",
   "version": "0.0.1",
-  "description": "A library for \"unsafe\" hot reloading.",
+  "description": "A library for \"unsafe\" client-side hot reloading.",
   "main": "index.js",
-  "repository": "https://github.com/zentner-kyle/kelvin",
+  "repository": "https://github.com/zentner-kyle/turbojet",
   "author": "Kyle Zentner",
   "license": "MIT",
   "private": false

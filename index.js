@@ -1,7 +1,7 @@
-function hideKelvinElements() {
+function hideTurbojetElements() {
   const el = document.createElement('style')
   el.innerHTML = `
-    .kelvin-script {
+    .turbojet-script {
       display: none;
     }
   `
@@ -22,16 +22,16 @@ function typedArraysEqual(a, b) {
   return true
 }
 
-const kelvinScriptContents = new Map()
+const turbojetScriptContents = new Map()
 
-function updateKelvinScripts() {
-  for (const el of document.querySelectorAll('.kelvin-script')) {
+function updateTurbojetScripts() {
+  for (const el of document.querySelectorAll('.turbojet-script')) {
     const src = el.getAttribute('src')
     fetch(src).then(response =>
       response.arrayBuffer().then(newContents => {
-      const oldContents = kelvinScriptContents.get(src)
+      const oldContents = turbojetScriptContents.get(src)
       if (!oldContents || !typedArraysEqual(newContents, oldContents)) {
-        kelvinScriptContents.set(src, newContents)
+        turbojetScriptContents.set(src, newContents)
         const blobSrc = URL.createObjectURL(new Blob([newContents], {'type': 'text/javascript'}))
         const el = document.createElement('script')
         el.setAttribute('src', blobSrc)
@@ -42,18 +42,18 @@ function updateKelvinScripts() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  updateKelvinScripts()
+  updateTurbojetScripts()
 })
 
-function updateKelvinScriptsInterval(interval=1000) {
-  setInterval(updateKelvinScripts, interval)
+function updateTurbojetScriptsInterval(interval=1000) {
+  setInterval(updateTurbojetScripts, interval)
 }
 
-hideKelvinElements()
+hideTurbojetElements()
 
 var module = module || {};
 
 module.exports = {
-  updateKelvinScripts,
-  updateKelvinScriptsInterval
+  updateScripts: updateTurbojetScripts,
+  updateScriptsInterval: updateTurbojetScriptsInterval
 };
