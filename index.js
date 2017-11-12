@@ -4,7 +4,10 @@ function hideTurbojetElements() {
     .turbojet-script {
       display: none;
     }
-  `
+    .turbojet-style {
+      display: none;
+    }`
+
   document.head.appendChild(el)
 }
 
@@ -13,8 +16,11 @@ function typedArraysEqual(a, b) {
     return false
   }
 
-  for (let i = 0; i < a.byteLength; i++) {
-    if (a[i] !== b[i]) {
+  const aView = new Uint8Array(a);
+  const bView = new Uint8Array(b);
+
+  for (let i = 0; i < aView.length; i++) {
+    if (aView[i] !== bView[i]) {
       return false
     }
   }
@@ -41,19 +47,53 @@ function updateTurbojetScripts() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateTurbojetScripts()
-})
-
 function updateTurbojetScriptsInterval(interval=1000) {
   setInterval(updateTurbojetScripts, interval)
 }
 
-hideTurbojetElements()
+const turbojetStyleContents = new Map()
+const turbojetStyleElements = new Map()
 
-var module = module || {};
+function updateTurbojetStyles() {
+  for (const el of document.querySelectorAll('.turbojet-style')) {
+    const src = el.getAttribute('src')
+    fetch(src).then(response =>
+      response.arrayBuffer().then(newContents => {
+      const oldContents = turbojetStyleContents.get(src)
+      if (!oldContents || !typedArraysEqual(newContents, oldContents)) {
+        turbojetStyleContents.set(src, newContents)
+        const blobSrc = URL.createObjectURL(new Blob([newContents], {'type': 'text/css'}))
+        let el = turbojetStyleElements.get(src)
+        if (!el) {
+          el = document.createElement('link')
+          el.setAttribute('rel', 'stylesheet')
+          el.setAttribute('href', blobSrc)
+          turbojetStyleElements.set(src, el)
+          document.body.append(el)
+        } else {
+          el.setAttribute('href', blobSrc)
+        }
+      }
+    }))
+  }
+}
+
+function updateTurbojetStylesInterval(interval=1000) {
+  setInterval(updateTurbojetStyles, interval)
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateTurbojetStyles()
+  updateTurbojetScripts()
+})
+
+var module = module || {}
 
 module.exports = {
   updateScripts: updateTurbojetScripts,
-  updateScriptsInterval: updateTurbojetScriptsInterval
-};
+  updateScriptsInterval: updateTurbojetScriptsInterval,
+  updateStyles: updateTurbojetStyles,
+  updateStylesInterval: updateTurbojetStylesInterval
+}
+
+hideTurbojetElements()
